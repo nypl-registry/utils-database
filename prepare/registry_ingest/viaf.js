@@ -1,4 +1,5 @@
 var clc = require('cli-color')
+var async = require('async')
 
 module.exports = function(db){
 
@@ -22,14 +23,29 @@ module.exports = function(db){
 
 				console.log("Creating Indexes")
 				//now prepare the indexes
-				collection.createIndex("normalized", {background: true})
-				collection.createIndex("fast", {background: true})
-				collection.createIndex("viaf", {background: true})
-				collection.createIndex("hasLc", {background: true})
-				collection.createIndex("hasDbn", {background: true})
-				collection.createIndex("lcId", {background: true})
-				collection.createIndex("gettyId", {background: true})
-				if (callback) callback()
+
+				async.each(['normalized','fast','viaf','hasLc','hasDbn','lcId','gettyId'], function(index, eachCallback){
+
+					collection.createIndex(index, {background: true}, function(err,results){
+						if (err) console.log(err)
+						eachCallback()
+					})
+
+
+				},function(err,results){
+					if (callback) callback()
+				})
+
+
+
+				// collection.createIndex("normalized", {background: true})
+				// collection.createIndex("fast", {background: true})
+				// collection.createIndex("viaf", {background: true})
+				// collection.createIndex("hasLc", {background: true})
+				// collection.createIndex("hasDbn", {background: true})
+				// collection.createIndex("lcId", {background: true})
+				// collection.createIndex("gettyId", {background: true})
+
 			})
 		})
 	}
