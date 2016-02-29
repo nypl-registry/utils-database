@@ -3,7 +3,7 @@ The database layer utilities
 
 This module contains methods to interact with the mongo databases across three servers: the registry ingest, the registry triple store and shadowcat. 
 
-Encrypted credentails are also stored in this module for the these servers and elasticsearch. You need to have the private key in your user folder (.ssh or root user folder) for the system to decrypt the server credentails.
+Encrypted credentials are also stored in this module for the these servers and elasticsearch. You need to have the private key in your user folder (.ssh or root user folder) for the system to decrypt the server credentials.
 
 You need to have the NODE_ENV enviormental varaible set to "production" or "development" 
 ```export NODE_ENV=development```
@@ -34,5 +34,7 @@ db.returnCollections({ shadowcat: ['bib','item'], registryIngest: ['tmsObjects']
 ```
 There are also the "prepare" methods that get mongo collections ready by dropping the collection, creating it, adding indexes. If you need to add a new index you would do so in here, located in ./prepare/registry_ingest/*
 
+
+If you need to change the server credentials you will need to regenerate a new encrypted value for them. To do this use the ```buildServerConfig()``` method. It will ask you for the IP addresss for all the servers and create a new encrypted string using the public key in this repo. You would need to take that string and update the ```this.serverInfo``` value in index.js
 
 
