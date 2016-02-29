@@ -333,11 +333,17 @@ function Database() {
 	this.prepareRegistryIngestArchivesCollections = require(__dirname + '/prepare/registry_ingest/archives_collections')(this)
 	this.prepareRegistryIngestArchivesComponents = require(__dirname + '/prepare/registry_ingest/archives_components')(this)
 	this.prepareRegistryIngestTmsObjects = require(__dirname + '/prepare/registry_ingest/tms_objects')(this)
-	this.prepareRegistryTripleStoreAgents = require(__dirname + '/prepare/registry_ingest/agents')(this)
-	this.prepareRegistryTripleStoreResources = require(__dirname + '/prepare/registry_ingest/resources')(this)
+	this.prepareRegistryTripleStoreAgents = require(__dirname + '/prepare/registry_store/agents')(this)
+	this.prepareRegistryTripleStoreResources = require(__dirname + '/prepare/registry_store/resources')(this)
 
 
-	//the error logger puts the error into a error collection
+
+	/**
+	 * Sends a error report to the error collection
+	 *
+	 * @param  {string} context - Where did this error happen?
+	 * @param  {string} error - What was the error?
+	 */
 	this.logError = require(__dirname + '/misc/error')(this)
 
 	//this is a legacy export feature. TODO make data paths better.
