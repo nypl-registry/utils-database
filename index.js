@@ -313,14 +313,27 @@ function Database() {
 	 * @param  {object} collectionNames - the collection name in the triple store
 	 * @param  {function} cb - returns the bulk instance
 	 */
-	exports.newTripleStoreBulkOp = function(col,cb){
-		exports.databaseConnectRegistryTripleStore(function(){
+	this.newTripleStoreBulkOp = function(col,cb){
+		this.databaseConnectRegistryTripleStore(function(){
 			var collection = exports.databaseTripleStore.collection(col)
 			var bulk = collection.initializeUnorderedBulkOp()
 			cb(bulk)
 		})
 	}
 
+	/**
+	 * Returns a BULK instance for a specified collection in the triple store
+	 *
+	 * @param  {object} collectionNames - the collection name in the triple store
+	 * @param  {function} cb - returns the bulk instance
+	 */
+	this.newRegistryIngestBulkOp = function(col,cb){
+		this.databaseConnectRegistryIngest(function(){
+			var collection = exports.databaseRegistryIngest.collection(col)
+			var bulk = collection.initializeUnorderedBulkOp()
+			cb(bulk)
+		})
+	}
 
 
 	//these are the  prepare functions for the differnt collections, drop/create/indexes, stuff like that
@@ -333,6 +346,8 @@ function Database() {
 	this.prepareRegistryIngestArchivesCollections = require(__dirname + '/prepare/registry_ingest/archives_collections')(this)
 	this.prepareRegistryIngestArchivesComponents = require(__dirname + '/prepare/registry_ingest/archives_components')(this)
 	this.prepareRegistryIngestTmsObjects = require(__dirname + '/prepare/registry_ingest/tms_objects')(this)
+	this.prepareViaf = require(__dirname + '/prepare/registry_ingest/viaf')(this)
+
 	this.prepareRegistryTripleStoreAgents = require(__dirname + '/prepare/registry_store/agents')(this)
 	this.prepareRegistryTripleStoreResources = require(__dirname + '/prepare/registry_store/resources')(this)
 
