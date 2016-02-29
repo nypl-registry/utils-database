@@ -24,6 +24,7 @@ module.exports = function(db){
 				//now prepare the indexes
 				collection.createIndex("normalized", {background: true})
 				collection.createIndex("fast", {background: true})
+				collection.createIndex("viaf", {background: true})
 				collection.createIndex("hasLc", {background: true})
 				collection.createIndex("hasDbn", {background: true})
 				collection.createIndex("lcId", {background: true})

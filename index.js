@@ -192,7 +192,7 @@ function Database() {
 			if (exports.collectionLookup[collectionName]){
 				cb(null,exports.collectionLookup[collectionName])
 			}else{
-				var collection = exports.databaseRegistry.collection(collectionName)
+				var collection = exports.databaseRegistryIngest.collection(collectionName)
 				exports.collectionLookup[collectionName] = collection
 				cb(null,exports.collectionLookup[collectionName])
 			}
