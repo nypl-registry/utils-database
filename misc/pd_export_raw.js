@@ -1,106 +1,84 @@
+module.exports = function (db) {
+  return function (context, error) {
+    var fs = require('fs')
+    // remove the existing file
+    fs.writeFileSync('data/pd_mms_items.ndjson', '')
+    fs.writeFileSync('data/pd_mms_items_missing_from_dc.ndjson', '')
 
-module.exports = function(db){
+    var solr_uuids = fs.readFileSync('data/pd-item-uuids.csv', 'utf8')
+    solr_uuids = solr_uuids.split('\n')
+    console.log(solr_uuids.length)
 
+    db.databaseConnectRegistryIngest(function () {
+      db.returnCollectionRegistry('mmsCollections', function (err, mmsCollections) {
+        if (err) console.log(err)
+        var collectionLookup = {}
+        console.log('Building Collection Title Lookup...')
+        // build a quick lookup
+        mmsCollections.find({ }, { title: 1 }).toArray(function (err, collections) {
+          if (err) console.log(err)
+          collections.forEach(function (c) {
+            collectionLookup[c._id] = c.title
+          })
 
-	return function(context,error){
+          db.returnCollectionRegistry('mmsCaptures', function (err, mmsCaptures) {
+            if (err) console.log(err)
+            // //loop through the items
+            db.returnCollectionRegistry('mmsItems', function (err, mmsItems) {
+              if (err) console.log(err)
+              var c = 0
+              var capturesCount = 0
+              var cursor = mmsItems.find({publicDomain: true, dcFlag: true})
 
-	 	//remove the existing file
-	 	fs.writeFileSync('data/pd_mms_items.ndjson', "")
-	 	fs.writeFileSync('data/pd_mms_items_missing_from_dc.ndjson', "")
+              // send the data to the calling function with the cursor
+              cursor.on('data', function (doc) {
+                cursor.pause()
 
-	 	var solr_uuids = fs.readFileSync('data/pd-item-uuids.csv', "utf8")
-	 	solr_uuids=solr_uuids.split("\n")
-	 	console.log(solr_uuids.length)
+                var title = ''
+                // if (col) if (col[0]) if (col[0].title) title = col[0].title
+                if (collectionLookup[doc.collectionUuid]) {
+                  title = collectionLookup[doc.collectionUuid]
+                }
 
-	 	db.databaseConnectRegistryIngest(function(){
+                doc.collectionTitle = title
 
-	 		db.returnCollectionRegistry("mmsCollections",function(err,mmsCollections){
+                // get the capture uuids
+                mmsCaptures.find({ itemUuid: doc._id }).toArray(function (err, captures) {
+                  if (err) console.log(err)
+                  doc.captures = []
 
-	 			var collectionLookup = {}
-	 			console.log("Building Collection Title Lookup...")
-	 			//build a quick lookup
-				mmsCollections.find({ }, { title: 1}).toArray(function(err, collections){
+                  if (captures) {
+                    captures.forEach(function (cap) {
+                      doc.captures.push({ uuid: cap._id, imageId: cap.imageId })
+                      capturesCount++
+                    })
+                  }
 
-					collections.forEach(function(c){
-						collectionLookup[c._id] = c.title
-					})
+                  // console.log(doc)
+                  var out = JSON.stringify(doc)
+                  c++
 
-					db.returnCollectionRegistry("mmsCaptures",function(err,mmsCaptures){
+                  if (solr_uuids.indexOf(doc._id) === -1) {
+                    fs.appendFile('data/pd_mms_items_missing_from_dc.ndjson', out + '\n', function (err) {
+                      if (err) console.log(err)
+                    })
+                  }
 
-						// //loop through the items
-			 			db.returnCollectionRegistry("mmsItems",function(err,mmsItems){
+                  fs.appendFile('data/pd_mms_items.ndjson', out + '\n', function (err) {
+                    if (err) console.log(err)
+                    cursor.resume()
+                    console.log(c, capturesCount)
+                  })
+                })
+              })
 
-							var c = 0
-							var capturesCount = 0
-							var cursor = mmsItems.find({ publicDomain : true, dcFlag: true  })
-
-							//send the data to the calling function with the cursor
-							cursor.on('data', function(doc) {
-
-								cursor.pause()
-
-				 				var title =""
-								//if (col) if (col[0]) if (col[0].title) title = col[0].title
-								if (collectionLookup[doc.collectionUuid]){
-									title = collectionLookup[doc.collectionUuid]
-								}
-
-				 				doc.collectionTitle = title
-
-				 				//get the capture uuids
-				 				mmsCaptures.find({ itemUuid: doc._id }).toArray(function(err, captures){
-
-				 					doc.captures = []
-
-				 					if (captures){
-					 					captures.forEach(function(cap){
-					 						doc.captures.push({  uuid: cap._id, imageId : cap.imageId })
-					 						capturesCount++
-					 					})
-					 				}
-
-									//console.log(doc)
-					 				var out = JSON.stringify(doc)
-					 				c++
-
-
-					 				if (solr_uuids.indexOf(doc._id)===-1){
-
-						 				fs.appendFile('data/pd_mms_items_missing_from_dc.ndjson', out + "\n", function (err) {
-
-						 				})
-
-					 				}
-
-					 				fs.appendFile('data/pd_mms_items.ndjson', out + "\n", function (err) {
-					 					cursor.resume()
-					 					console.log(c,capturesCount)
-					 				})
-
-
-
-				 				})
-
-
-
-							})
-
-							cursor.once('end', function() {
-
-								//db.databaseClose()
-							})
-
-						})
-					})
-
-		 		})
-
-	 		})
-
-	 	})
-
-
-
-
-	}
+              cursor.once('end', function () {
+                // db.databaseClose()
+              })
+            })
+          })
+        })
+      })
+    })
+  }
 }
