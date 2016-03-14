@@ -353,7 +353,9 @@ function Database () {
   // Init.
 
   // store the credentials
-  this.serverCreds = JSON.parse(this.setServerConfig())
+  if (process.env.NODE_ENV && process.env.NODE_ENV !== 'travis') {
+    this.serverCreds = JSON.parse(this.setServerConfig())
+  }
   // set the IPs to use
   if (process.env.NODE_ENV === 'production') {
     this.registryIngestServer = `mongodb://${this.serverCreds.rip}:27017/registry`
