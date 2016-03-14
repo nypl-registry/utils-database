@@ -12,7 +12,7 @@ function Database () {
   if (!process.env.NODE_ENV) {
     throw new Error("Unset NODE_ENV var: The NODE_ENV enviorment variable is not set.\nSet it to 'production' or 'development' type: 'export NODE_ENV=development' ")
   }
-  if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'travis') {
     throw new Error("Unset NODE_ENV var: The NODE_ENV enviorment variable is not set.\nSet it to 'production' or 'development' type: 'export NODE_ENV=development' ")
   }
 
