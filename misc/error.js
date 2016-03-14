@@ -1,3 +1,5 @@
+var clc = require('cli-color')
+
 module.exports = function (db) {
   return function (context, error) {
     db.databaseConnectRegistryIngest(function () {
@@ -5,6 +7,8 @@ module.exports = function (db) {
         var collection = db.databaseRegistryIngest.collection('errors')
         db.collectionLookup['errors'] = collection
       }
+
+      console.log(clc.black.bgRedBright(context), clc.black.bgRedBright(error))
 
       var insert = {
         date: new Date().toString(),

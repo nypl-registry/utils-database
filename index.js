@@ -27,7 +27,9 @@ function Database () {
       fs.statSync(os.homedir() + '/registry_node_server_info')
       this.privateKeyPath = os.homedir() + '/registry_node_server_info'
     } catch (e) {
-      throw new Error('Could not locate the private key for the server credentails. Put the private key in your user .ssh directory: ' + os.homedir() + '/.ssh/registry_node_server_info' + ' Or just in your user directory: ' + os.homedir() + '/registry_node_server_info')
+      if (process.env.NODE_ENV && process.env.NODE_ENV !== 'travis') {
+        throw new Error('Could not locate the private key for the server credentails. Put the private key in your user .ssh directory: ' + os.homedir() + '/.ssh/registry_node_server_info' + ' Or just in your user directory: ' + os.homedir() + '/registry_node_server_info')
+      }
     }
   }
 
@@ -158,7 +160,7 @@ function Database () {
   /**
    * return a collection requested, resuing the same DB connection and collection reference when possible
    *
- 	 * @param  {string} collectionName - the collection requestd
+   * @param  {string} collectionName - the collection requestd
    * @param  {function} cb - returns the collection
    */
   this.returnCollectionShadowcat = function (collectionName, cb) {
@@ -176,7 +178,7 @@ function Database () {
   /**
    * return a collection requested, resuing the same DB connection and collection reference when possible
    *
- 	 * @param  {string} collectionName - the collection requestd
+   * @param  {string} collectionName - the collection requestd
    * @param  {function} cb - returns the collection
    */
   this.returnCollectionRegistry = function (collectionName, cb) {
