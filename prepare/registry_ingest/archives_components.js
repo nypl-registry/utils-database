@@ -1,4 +1,5 @@
 var clc = require('cli-color')
+var async = require('async')
 
 module.exports = function (db) {
   return function (callback) {
@@ -15,17 +16,25 @@ module.exports = function (db) {
         }
 
         // now prepare the indexes
-        collection.createIndex('mssDb', {background: true})
-        collection.createIndex('mss', {background: true})
-        collection.createIndex('bNumber', {background: true})
-        collection.createIndex('callNumber', {background: true})
-        collection.createIndex('collectionDb', {background: true})
-        collection.createIndex('orderSequence', {background: true})
-        collection.createIndex('divisions', {background: true})
-        collection.createIndex('uuid', {background: true})
-        collection.createIndex('levelText', {background: true})
+        // collection.createIndex('mssDb', {background: true})
+        // collection.createIndex('mss', {background: true})
+        // collection.createIndex('bNumber', {background: true})
+        // collection.createIndex('callNumber', {background: true})
+        // collection.createIndex('collectionDb', {background: true})
+        // collection.createIndex('orderSequence', {background: true})
+        // collection.createIndex('divisions', {background: true})
+        // collection.createIndex('uuid', {background: true})
+        // collection.createIndex('levelText', {background: true})
 
-        if (callback) callback()
+        async.each(['mssDb', 'mss', 'bNumber', 'callNumber', 'collectionDb', 'orderSequence', 'divisions', 'uuid', 'levelText'], function (index, eachCallback) {
+          collection.createIndex(index, {background: true}, function (err, results) {
+            if (err) console.log(err)
+            eachCallback()
+          })
+        }, function (err, results) {
+          if (err) console.log(err)
+          if (callback) callback()
+        })
       })
     })
   }

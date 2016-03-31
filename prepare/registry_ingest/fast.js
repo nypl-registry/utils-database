@@ -20,7 +20,7 @@ module.exports = function (db) {
 
         console.log('Creating Indexes')
         // now prepare the indexes
-        async.each(['normalized', 'sameAsLc'], function (index, eachCallback) {
+        async.each(['normalized', 'sameAsLc', 'prefLabel'], function (index, eachCallback) {
           collection.createIndex(index, {background: true}, function (err, results) {
             if (err) console.log(err)
             eachCallback()

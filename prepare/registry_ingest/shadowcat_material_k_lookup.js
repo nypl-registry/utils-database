@@ -15,9 +15,11 @@ module.exports = function (db) {
         }
 
         // now prepare the indexes
-        collection.createIndex('sc:callnumber', {background: true})
+        collection.createIndex('sc:callnumber', {background: true}, function (err, results) {
+          if (err) console.log(err)
 
-        if (callback) callback()
+          if (callback) callback()
+        })
       })
     })
   }

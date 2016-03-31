@@ -1,4 +1,5 @@
 var clc = require('cli-color')
+var async = require('async')
 
 module.exports = function (db) {
   return function (callback) {
@@ -23,7 +24,15 @@ module.exports = function (db) {
         collection.createIndex('uuid', {background: true})
         collection.createIndex('imageId', {background: true})
 
-        if (callback) callback()
+        async.each(['mmsDb', 'itemMmsDb', 'itemUuid', 'collectionMmsDb', 'containerMmsDb', 'uuid', 'imageId'], function (index, eachCallback) {
+          collection.createIndex(index, {background: true}, function (err, results) {
+            if (err) console.log(err)
+            eachCallback()
+          })
+        }, function (err, results) {
+          if (err) console.log(err)
+          if (callback) callback()
+        })
       })
     })
   }

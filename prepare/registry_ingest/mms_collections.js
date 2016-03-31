@@ -1,4 +1,5 @@
 var clc = require('cli-color')
+var async = require('async')
 
 module.exports = function (db) {
   return function (callback) {
@@ -15,13 +16,22 @@ module.exports = function (db) {
         }
 
         // now prepare the indexes
-        collection.createIndex('mmsDb', {background: true})
-        collection.createIndex('bNumber', {background: true})
-        collection.createIndex('callNumber', {background: true})
-        collection.createIndex({'title': 'text'}, {background: true})
-        collection.createIndex('archivesCollectionDb', {background: true})
+        // collection.createIndex('mmsDb', {background: true})
+        // collection.createIndex('bNumber', {background: true})
+        // collection.createIndex('callNumber', {background: true})
+        // collection.createIndex('archivesCollectionDb', {background: true})
 
-        if (callback) callback()
+        collection.createIndex({'title': 'text'}, {background: true})
+
+        async.each(['mmsDb', 'bNumber', 'callNumber', 'archivesCollectionDb'], function (index, eachCallback) {
+          collection.createIndex(index, {background: true}, function (err, results) {
+            if (err) console.log(err)
+            eachCallback()
+          })
+        }, function (err, results) {
+          if (err) console.log(err)
+          if (callback) callback()
+        })
       })
     })
   }

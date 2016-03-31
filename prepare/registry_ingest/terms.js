@@ -1,4 +1,5 @@
 var clc = require('cli-color')
+var async = require('async')
 
 module.exports = function (db) {
   return function (callback) {
@@ -19,13 +20,23 @@ module.exports = function (db) {
         var collection = db.databaseRegistryIngest.collection('terms')
 
         console.log('Creating Indexes')
-        collection.createIndex('fast', {background: true, unique: true})
-        collection.createIndex('fastAll', {background: true, unique: true})
-        collection.createIndex('registry', {background: true, unique: true})
-        collection.createIndex('termControlled', {background: true, unique: true})
-        collection.createIndex('termNormalized', {background: true})
+        // collection.createIndex('fast', {background: true, unique: true})
+        // collection.createIndex('fastAll', {background: true, unique: true})
+        // collection.createIndex('registry', {background: true, unique: true})
+        // collection.createIndex('termControlled', {background: true, unique: true})
+        // collection.createIndex('termNormalized', {background: true})
 
-        if (callback) callback()
+        var uniques = {'fast': true, 'fastAll': true, 'registry': true, 'termControlled': true}
+
+        async.each(['fast', 'fastAll', 'registry', 'termControlled', 'termNormalized'], function (index, eachCallback) {
+          collection.createIndex(index, {background: true, unique: (uniques[index])}, function (err, results) {
+            if (err) console.log(err)
+            eachCallback()
+          })
+        }, function (err, results) {
+          if (err) console.log(err)
+          if (callback) callback()
+        })
       })
     })
   }
