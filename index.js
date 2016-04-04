@@ -66,7 +66,7 @@ function Database () {
    *
    * @return {string}
    */
-  this.setServerConfig = function () {
+  this.setServerConfig = function (decrypThis) {
     var decryptStringWithRsaPrivateKey = function (toDecrypt, relativeOrAbsolutePathtoPrivateKey) {
       var absolutePath = path.resolve(relativeOrAbsolutePathtoPrivateKey)
       var privateKey = fs.readFileSync(absolutePath, 'utf8')
@@ -74,7 +74,7 @@ function Database () {
       var decrypted = crypto.privateDecrypt(privateKey, buffer)
       return decrypted.toString('utf8')
     }
-    return decryptStringWithRsaPrivateKey(this.serverInfo, this.privateKeyPath)
+    return decryptStringWithRsaPrivateKey(decrypThis, this.privateKeyPath)
   }
 
   // Basic DB stuff:
@@ -355,7 +355,7 @@ function Database () {
 
   // store the credentials
   if (process.env.NODE_ENV && process.env.NODE_ENV !== 'travis') {
-    this.serverCreds = JSON.parse(this.setServerConfig())
+    this.serverCreds = JSON.parse(this.setServerConfig(this.serverInfo))
   }
   // set the IPs to use
   if (process.env.NODE_ENV === 'production') {
