@@ -334,6 +334,8 @@ function Database () {
   this.prepareRegistryIngestArchivesComponents = require(`${__dirname}/prepare/registry_ingest/archives_components`)(this)
   this.prepareRegistryIngestTmsObjects = require(`${__dirname}/prepare/registry_ingest/tms_objects`)(this)
   this.prepareRegistryIngestShadowcatMaterialKLookup = require(`${__dirname}/prepare/registry_ingest/shadowcat_material_k_lookup`)(this)
+  this.prepareRegistryIngestSerialized = require(`${__dirname}/prepare/registry_ingest/serialized`)(this)
+
   this.prepareViaf = require(`${__dirname}/prepare/registry_ingest/viaf`)(this)
   this.prepareFast = require(`${__dirname}/prepare/registry_ingest/fast`)(this)
 

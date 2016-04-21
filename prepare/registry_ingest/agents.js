@@ -29,7 +29,7 @@ module.exports = function (db) {
 
         var uniques = {'viaf': true, 'registry': true, 'nameControlled': true}
 
-        async.each(['viaf', 'registry', 'nameControlled', 'nameNormalized'], function (index, eachCallback) {
+        async.each(['viaf', 'registry', 'nameControlled', 'nameNormalized', 'lcId'], function (index, eachCallback) {
           collection.createIndex(index, {background: true, unique: (uniques[index])}, function (err, results) {
             if (err) console.log(err)
             eachCallback()
